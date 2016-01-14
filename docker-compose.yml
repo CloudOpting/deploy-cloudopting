@@ -1,17 +1,3 @@
-manager:
-  # image: cloudopting/manager
-  build: ./manager
-  restart: always
-  hostname: manager
-  container_name: manager
-  links:
-    - manager-db:db
-    # - crane-commander:crane
-  environment:
-    - JAVA_OPTS= -Dspring.profiles.active=prod
-  ports:
-    - "8080:8080"
-
 manager-db:
   image: cloudopting/manager-db
   # build: ./database
@@ -22,5 +8,29 @@ manager-db:
     - POSTGRES_USER=postgres
     - POSTGRES_PASSWORD=1qaz2wsx
   # Expose ports only for debug
-  # ports:
-  #   - "5432:5432"
+  ports:
+    - "5432:5432"
+
+manager-jcr:
+  image: rootlogin/jackrabbit
+  restart: always
+  hostname: jcr
+  container_name: manager-jcr
+  #environment:
+  ports:
+    - "8082:8080"
+
+manager:
+  # image: cloudopting/manager
+  build: ./manager
+  restart: always
+  hostname: manager
+  container_name: manager
+  links:
+    - manager-db:db
+    - manager-jcr:jcr
+    # - crane-commander:crane
+  environment:
+    - JAVA_OPTS= -Dspring.profiles.active=prod
+  ports:
+    - "8080:8080"
