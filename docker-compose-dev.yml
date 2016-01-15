@@ -1,24 +1,24 @@
-manager-db:
+manager-db-dev:
   image: cloudopting/manager-db
   # build: ./database
   restart: always
-  hostname: db
-  container_name: manager-db
+  hostname: db-dev
+  container_name: manager-db-dev
   environment:
     - POSTGRES_USER=postgres
     - POSTGRES_PASSWORD=1qaz2wsx
   # Expose ports only for debug
   ports:
-    - "5432:5432"
+    - "5433:5432"
 
-manager-jcr:
+manager-jcr-dev:
   image: rootlogin/jackrabbit
   restart: always
-  hostname: jcr
-  container_name: manager-jcr
+  hostname: jcr-dev
+  container_name: manager-jcr-dev
   #environment:
   ports:
-    - "8082:8080"
+    - "8083:8080"
 
 #manager:
   # image: cloudopting/manager
