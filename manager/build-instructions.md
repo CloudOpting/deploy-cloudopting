@@ -8,10 +8,13 @@ git clone https://github.com/CloudOpting/cloudopting-manager
 
 Edit the file: `rest-component/src/main/resources/config/application-prod.yml`.
 
-Change the properties `url`, `serverName` as follows and choose a password different to the default one.
+Change the properties `repo_url`, `url`, `serverName` as follows and choose a password different to the default one.
 
 ```yaml
 ...
+jcr:
+    repo_url: http://jcr:8080/server
+        
 datasource:
     dataSourceClassName: org.postgresql.ds.PGSimpleDataSource
     driver: org.postgresql.Driver
