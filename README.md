@@ -1,7 +1,7 @@
 # deploy-cloudopting
 Assisted deploy for the entire CloudOpting platform.
 
-Executing `docker-compose up` and it will install and run all in your computer.
+Executing `docker-compose -f compose up` and it will install and run all in your computer.
 
 ## Furder Instructions to customize your installation
 

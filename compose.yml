@@ -1,0 +1,143 @@
+# Monitor
+fluentd:
+  build: ./monitor/fluentd
+  restart: always
+  volumes:
+    # Replace with path to config file of fluentd in CloudOpting machine
+    - ./monitor/fluentd/volumes/etc:/fluentd/etc
+    # Replace with path to certs in CloudOpting machine:/fluentd/certs
+    - ./certs/fluentd:/fluentd/certs
+  environment:
+    - FLUENTD_CONF=cloudopting.conf
+  container_name: fluentd
+  hostname: fluentd
+  ports:
+    - "24224:24224"
+    - "5601:5601"
+
+elasticsearch:
+  image: elasticsearch:2
+  restart: always
+  net: "container:fluentd"
+  container_name: elasticsearch
+
+kibana:
+  image: kibana:4
+  restart: always
+  net: "container:fluentd"
+  environment:
+    - ELASTICSEARCH_URL=http://localhost:9200
+  container_name: kibana
+
+# Crane
+commander:
+  image: cloudopting/cranecommander
+  hostname: cocommander
+  container_name: co_commander
+  environment:
+    - DEBUG=true
+    - REDIS=true
+  ports:
+    - "8888:8888"
+  volumes:
+    - ./certs/commander:/var/lib/commander/certs
+    - ./commander/commander-data-tests/r10k/git:/root/.r10k/git
+    - ./commander/commander-data-tests/var/crane:/var/crane/
+  links:
+    - redis
+    - registry:coregistry
+    - engine:coengine
+    - emulatedhost
+# Uncomment this to run manually
+#   command: tail -f /dev/null
+
+registry:
+  image: registry:2
+  container_name: co_registry
+  ports:
+    - 5000:5000
+  volumes:
+    - ./registry/registry-data-tests:/var/lib/registry
+    - ./certs/registry:/certs
+  environment:
+    REGISTRY_HTTP_TLS_CERTIFICATE: /certs/domain.crt
+    REGISTRY_HTTP_TLS_KEY: /certs/domain.key
+    REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY: /var/lib/registry
+# Disabled registry authentication
+#    REGISTRY_AUTH_HTPASSWD_PATH: /auth/htpasswd
+#    REGISTRY_AUTH_HTPASSWD_REALM: Registry Realm
+
+engine:
+  image: cloudopting/craneengine
+  privileged: true
+  volumes:
+    - /var/lib/docker
+    - ./certs/engine:/var/lib/coengine/certs
+  hostname: coengine
+  environment:
+    - DOCKER_DAEMON_ARGS=--tlsverify --tlscacert=/var/lib/coengine/certs/ca.pem --tlscert=/var/lib/coengine/certs/server-cert.pem --tlskey=/var/lib/coengine/certs/server-key.pem
+    - PORT=4243
+  container_name: co_engine
+  links:
+    - registry:coregistry
+
+redis:
+  image: redis:3
+  container_name: co_redis
+  ports:
+    - 6379:6379
+
+emulatedhost:
+  image: cloudopting/craneemulatedhost
+  privileged: true
+  volumes:
+    - /var/lib/docker
+    - ./certs/emulatedhost:/var/lib/emulatedhost/certs
+  hostname: coengine
+  environment:
+    - DOCKER_DAEMON_ARGS=--tlsverify --tlscacert=/var/lib/emulatedhost/certs/ca.pem --tlscert=/var/lib/emulatedhost/certs/emulatedhost-cert.pem --tlskey=/var/lib/emulatedhost/certs/emulatedhost-key.pem
+    - PORT=4243
+  container_name: co_emulatedhost
+  links:
+    - registry:coregistry
+# Uncomment this to run manually
+#  command: tail -f /dev/null
+
+# Manager
+manager_db:
+  image: cloudopting/manager-db
+  #build: ./database
+  restart: always
+  hostname: db
+  container_name: manager_db
+  environment:
+    - POSTGRES_USER=postgres
+    - POSTGRES_PASSWORD=1qaz2wsx
+  # Expose ports only for debug
+  #ports:
+  #  - "5432:5432"
+
+manager_jcr:
+  build: ./jackrabbit
+  restart: always
+  hostname: jcr
+  container_name: manager_jcr
+  #environment:
+  ports:
+    - "8082:8080"
+
+manager:
+  #image: cloudopting/manager
+  build: ./manager
+  restart: always
+  hostname: manager
+  container_name: manager
+  links:
+    - manager_db:db
+    - manager_jcr:jcr
+    - commander:crane
+    - fluentd:monitor
+  environment:
+    - JAVA_OPTS=-Dspring.profiles.active=prod
+  ports:
+    - "8080:8080"
