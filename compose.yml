@@ -1,6 +1,7 @@
 # Monitor
 fluentd:
-  build: ./monitor/fluentd
+  image: cloudopting/fluentd
+#  build: ./monitor/fluentd
   restart: always
   volumes:
     # Replace with path to config file of fluentd in CloudOpting machine
@@ -47,7 +48,7 @@ commander:
     - redis
     - registry:coregistry
     - engine:coengine
-    - emulatedhost
+#    - emulatedhost
 # Uncomment this to run manually
 #   command: tail -f /dev/null
 
@@ -87,26 +88,26 @@ redis:
   ports:
     - 6379:6379
 
-emulatedhost:
-  image: cloudopting/craneemulatedhost
-  privileged: true
-  volumes:
-    - /var/lib/docker
-    - ./certs/emulatedhost:/var/lib/emulatedhost/certs
-  hostname: coengine
-  environment:
-    - DOCKER_DAEMON_ARGS=--tlsverify --tlscacert=/var/lib/emulatedhost/certs/ca.pem --tlscert=/var/lib/emulatedhost/certs/emulatedhost-cert.pem --tlskey=/var/lib/emulatedhost/certs/emulatedhost-key.pem
-    - PORT=4243
-  container_name: co_emulatedhost
-  links:
-    - registry:coregistry
-# Uncomment this to run manually
-#  command: tail -f /dev/null
+#emulatedhost:
+#  image: cloudopting/craneemulatedhost
+#  privileged: true
+#  volumes:
+#    - /var/lib/docker
+#    - ./certs/emulatedhost:/var/lib/emulatedhost/certs
+#  hostname: coengine
+#  environment:
+#    - DOCKER_DAEMON_ARGS=--tlsverify --tlscacert=/var/lib/emulatedhost/certs/ca.pem --tlscert=/var/lib/emulatedhost/certs/emulatedhost-cert.pem --tlskey=/var/lib/emulatedhost/certs/emulatedhost-key.pem
+#    - PORT=4243
+#  container_name: co_emulatedhost
+#  links:
+#    - registry:coregistry
+## Uncomment this to run manually
+##  command: tail -f /dev/null
 
 # Manager
 manager_db:
   image: cloudopting/manager-db
-  #build: ./database
+#  build: ./database
   restart: always
   hostname: db
   container_name: manager_db
@@ -118,7 +119,8 @@ manager_db:
   #  - "5432:5432"
 
 manager_jcr:
-  build: ./jackrabbit
+  image: cloudopting/manager-jcr
+#  build: ./jackrabbit
   restart: always
   hostname: jcr
   container_name: manager_jcr
@@ -127,8 +129,8 @@ manager_jcr:
     - "8082:8080"
 
 manager:
-  #image: cloudopting/manager
-  build: ./manager
+  image: cloudopting/manager
+#  build: ./manager
   restart: always
   hostname: manager
   container_name: manager

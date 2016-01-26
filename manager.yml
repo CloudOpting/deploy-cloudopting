@@ -1,6 +1,6 @@
 manager_db:
   image: cloudopting/manager-db
-  #build: ./database
+#  build: ./database
   restart: always
   hostname: db
   container_name: manager_db
@@ -12,8 +12,8 @@ manager_db:
   #  - "5432:5432"
 
 manager_jcr:
-  #image: rootlogin/jackrabbit
-  build: ./jackrabbit
+  image: cloudopting/manager-jcr
+#  build: ./jackrabbit
   restart: always
   hostname: jcr
   container_name: manager_jcr
@@ -22,15 +22,16 @@ manager_jcr:
     - "8082:8080"
 
 manager:
-  #image: cloudopting/manager
-  build: ./manager
+  image: cloudopting/manager
+#  build: ./manager
   restart: always
   hostname: manager
   container_name: manager
   links:
     - manager_db:db
     - manager_jcr:jcr
-    # - crane-commander:crane
+#    - commander:crane
+#    - fluentd:monitor
   environment:
     - JAVA_OPTS=-Dspring.profiles.active=prod
   ports:
