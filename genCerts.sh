@@ -17,6 +17,9 @@ export REGISTRY_CERTS_DIR=certs/registry
 export REGISTRY_DEF_USER=reguser
 export REGISTRY_DEF_USER_PASS=s3cr3tp4ssw0rd
 
+export FLUENTD_HOSTNAME=fluentd
+export FLUENTD_CERTS_DIR=certs/fluentd
+
 
 # Colors
 ERR='\033[0;31m'
@@ -29,7 +32,18 @@ OP='\033[2;33m'
 NC='\033[0m' # No Color
 
 # Clean previous certs
-rm -rf ${ENGINE_CERTS_DIR} ${REGISTRY_AUTH_DIR} ${REGISTRY_CERTS_DIR} ${COMMANDER_CERTS_DIR} ${COMMANDER_MASTER_CERTS_DIR} ${COMMANDER_CERTS_DIR} ${TESTRUNNER_CERTS_DIR} ${EMULATEDHOST_CERTS_DIR}
+rm -rf ${FLUENTD_CERTS_DIR} ${ENGINE_CERTS_DIR} ${REGISTRY_AUTH_DIR} ${REGISTRY_CERTS_DIR} ${COMMANDER_CERTS_DIR} ${COMMANDER_MASTER_CERTS_DIR} ${COMMANDER_CERTS_DIR} ${TESTRUNNER_CERTS_DIR} ${EMULATEDHOST_CERTS_DIR}
+
+# FLUENTD CERTIFICATES
+mkdir -p ${FLUENTD_CERTS_DIR}
+## CA [ca_cert.pem, ca_key.pem]
+printf "${INFO}Generating CA key and cert for fluentd...${NC}\n\n"
+printf "${OP}"
+openssl genrsa -aes256 -passout env:CA_PASSWORD -out ${FLUENTD_CERTS_DIR}/ca_key.pem 4096
+openssl req -new -x509 -passin env:CA_PASSWORD -days 365 -key ${FLUENTD_CERTS_DIR}/ca_key.pem \
+  -sha256 -out ${FLUENTD_CERTS_DIR}/ca_cert.pem -subj "/C=ES/ST=Seville/L=Seville/O=CloudOpting/OU=IT/CN=$FLUENTD_HOSTNAME"
+printf "${NC}"
+printf "\n${SUCC}Got ${ELEM}ca_key.pem${SUCC} and ${ELEM}ca_cert.pem${SUCC} .${NC}\n\n\n"
 
 
 # ENGINE CERTIFICATES
