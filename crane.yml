@@ -13,7 +13,7 @@ commander:
     - ./commander/commander-data-tests/var/crane:/var/crane/
     # Override application copied with the actual folder mounted as volume.
     # Allows real time changes and log monitoring from editor
-    - ./commander/app:/usr/src/commander
+  #  - ./commander/app:/usr/src/commander
   links:
     - redis
     - registry:coregistry
