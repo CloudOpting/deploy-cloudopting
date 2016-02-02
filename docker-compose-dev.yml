@@ -31,6 +31,6 @@ manager-jcr-dev:
   #  - manager-jcr:jcr
     # - crane-commander:crane
   #environment:
-  #  - JAVA_OPTS= -Dspring.profiles.active=prod
+  #  - JAVA_OPTS= -Dspring.profiles.active=docker
   #ports:
   #  - "8080:8080"

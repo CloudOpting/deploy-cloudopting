@@ -140,6 +140,6 @@ manager:
     - commander:crane
     - fluentd:monitor
   environment:
-    - JAVA_OPTS=-Dspring.profiles.active=prod
+    - JAVA_OPTS=-Dspring.profiles.active=docker
   ports:
     - "8080:8080"
