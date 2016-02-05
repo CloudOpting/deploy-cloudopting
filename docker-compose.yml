@@ -12,7 +12,7 @@ manager_db:
   #  - "5432:5432"
 
 manager_jcr:
-  image: rootlogin/jackrabbit
+  image: cloudopting/manager-jcr
   #build: ./jackrabbit
   restart: always
   hostname: jcr
