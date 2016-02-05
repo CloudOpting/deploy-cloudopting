@@ -12,8 +12,8 @@ manager_db:
   #  - "5432:5432"
 
 manager_jcr:
-  #image: rootlogin/jackrabbit
-  build: ./jackrabbit
+  image: rootlogin/jackrabbit
+  #build: ./jackrabbit
   restart: always
   hostname: jcr
   container_name: manager_jcr
@@ -22,8 +22,8 @@ manager_jcr:
     - "8082:8080"
 
 manager:
-  #image: cloudopting/manager
-  build: ./manager
+  image: cloudopting/manager
+  #build: ./manager
   restart: always
   hostname: manager
   container_name: manager
