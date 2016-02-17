@@ -3,11 +3,15 @@ Assisted deploy for the entire CloudOpting platform.
 
 Clone git repository: git clone https://github.com/CloudOpting/deploy-cloudopting.git
 
-execute genCerts.sh: ./genCerts.sh
+In first place execute genCerts.sh: ./genCerts.sh
+second ./deploy-monitor.sh
+finally ./deploy-cloudopting.sh
 
-deploy CloudOpting: Executing `docker-compose -f compose.yml up` and it will install and run all in your computer.
+
 
 You can access from your browser: localhost:8080/cloudopting
+You can access to Kibana in: localhost:5601
+You can test your files with crane standalone in localhost:8888
 
 ## Furder Instructions to customize your installation
 
