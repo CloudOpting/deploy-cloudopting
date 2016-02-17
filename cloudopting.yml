@@ -1,38 +1,44 @@
-# Monitor
-fluentd:
-  image: cloudopting/fluentd
-#  build: ./monitor/fluentd
+manager_db:
+  image: cloudopting/manager-db
+  #build: ./database
   restart: always
-  volumes:
-    # Replace with path to config file of fluentd in CloudOpting machine
-    - ./monitor/fluentd/volumes/etc:/fluentd/etc
-    # Replace with path to certs in CloudOpting machine:/fluentd/certs
-    - ./certs/fluentd:/fluentd/certs
+  hostname: db
+  container_name: co_manager_db
   environment:
-    - FLUENTD_CONF=cloudopting.conf
-  container_name: fluentd
-  hostname: fluentd
+    - POSTGRES_USER=postgres
+    - POSTGRES_PASSWORD=1qaz2wsx
+  # Expose ports only for debug
+  #ports:
+  #  - "5432:5432"
+
+manager_jcr:
+  image: cloudopting/manager-jcr
+  #build: ./jackrabbit
+  restart: always
+  hostname: jcr
+  container_name: co_manager_jcr
+  #environment:
   ports:
-    - "24224:24224"
-    - "5601:5601"
+    - "8082:8080"
 
-elasticsearch:
-  image: elasticsearch:2
+manager:
+  image: cloudopting/manager:1.1.3
+  #build: ./manager
   restart: always
-  net: "container:fluentd"
-  container_name: elasticsearch
-
-kibana:
-  image: kibana:4
-  restart: always
-  net: "container:fluentd"
+  hostname: manager
+  container_name: co_manager
+  links:
+    - manager_db:db
+    - manager_jcr:jcr
+    - commander:crane
   environment:
-    - ELASTICSEARCH_URL=http://localhost:9200
-  container_name: kibana
+    - JAVA_OPTS=-Dspring.profiles.active=docker
+  ports:
+    - "8080:8080"
 
-# Crane
 commander:
   image: cloudopting/cranecommander
+  restart: always
   hostname: cocommander
   container_name: co_commander
   environment:
@@ -44,6 +50,9 @@ commander:
     - ./certs/commander:/var/lib/commander/certs
     - ./commander/commander-data-tests/r10k/git:/root/.r10k/git
     - ./commander/commander-data-tests/var/crane:/var/crane/
+    # Override application copied with the actual folder mounted as volume.
+    # Allows real time changes and log monitoring from editor
+  #  - ./commander/app:/usr/src/commander
   links:
     - redis
     - registry:coregistry
@@ -51,9 +60,14 @@ commander:
 #    - emulatedhost
 # Uncomment this to run manually
 #   command: tail -f /dev/null
+  log_driver: "fluentd"
+  log_opt:
+    fluentd-address: "172.17.0.2:24225"
+    fluentd-tag: "cranecommander.{{.Name}}.{{.ID}}"
 
 registry:
   image: registry:2
+  restart: always
   container_name: co_registry
   ports:
     - 5000:5000
@@ -67,10 +81,15 @@ registry:
 # Disabled registry authentication
 #    REGISTRY_AUTH_HTPASSWD_PATH: /auth/htpasswd
 #    REGISTRY_AUTH_HTPASSWD_REALM: Registry Realm
+  log_driver: "fluentd"
+  log_opt:
+   fluentd-address: "172.17.0.2:24225"
+   fluentd-tag: "craneregistry.{{.Name}}.{{.ID}}"
 
 engine:
   image: cloudopting/craneengine
   privileged: true
+  restart: always
   volumes:
     - /var/lib/docker
     - ./certs/engine:/var/lib/coengine/certs
@@ -81,16 +100,26 @@ engine:
   container_name: co_engine
   links:
     - registry:coregistry
+  log_driver: "fluentd"
+  log_opt:
+    fluentd-address: "172.17.0.2:24225"
+    fluentd-tag: "craneengine.{{.Name}}.{{.ID}}"
 
 redis:
   image: redis:3
+  restart: always
   container_name: co_redis
   ports:
     - 6379:6379
+  log_driver: "fluentd"
+  log_opt:
+    fluentd-address: "172.17.0.2:24225"
+    fluentd-tag: "craneredis.{{.Name}}.{{.ID}}"
 
 #emulatedhost:
 #  image: cloudopting/craneemulatedhost
 #  privileged: true
+#  restart: always
 #  volumes:
 #    - /var/lib/docker
 #    - ./certs/emulatedhost:/var/lib/emulatedhost/certs
@@ -103,43 +132,7 @@ redis:
 #    - registry:coregistry
 ## Uncomment this to run manually
 ##  command: tail -f /dev/null
-
-# Manager
-manager_db:
-  image: cloudopting/manager-db
-#  build: ./database
-  restart: always
-  hostname: db
-  container_name: manager_db
-  environment:
-    - POSTGRES_USER=postgres
-    - POSTGRES_PASSWORD=1qaz2wsx
-  # Expose ports only for debug
-  #ports:
-  #  - "5432:5432"
-
-manager_jcr:
-  image: cloudopting/manager-jcr
-#  build: ./jackrabbit
-  restart: always
-  hostname: jcr
-  container_name: manager_jcr
-  #environment:
-  ports:
-    - "8082:8080"
-
-manager:
-  image: cloudopting/manager
-#  build: ./manager
-  restart: always
-  hostname: manager
-  container_name: manager
-  links:
-    - manager_db:db
-    - manager_jcr:jcr
-    - commander:crane
-    - fluentd:monitor
-  environment:
-    - JAVA_OPTS=-Dspring.profiles.active=docker
-  ports:
-    - "8080:8080"
+#  log_driver: "fluentd"
+#  log_opt:
+#    fluentd-address: "172.17.0.2:24225"
+#    fluentd-tag: "craneemulatedhost.{{.Name}}.{{.ID}}"
