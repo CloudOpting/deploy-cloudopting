@@ -1,6 +1,6 @@
 fluentd:
-#  image: cloudopting/fluentd
-  build: ./monitor/fluentd
+  image: cloudopting/fluentd
+#  build: ./monitor/fluentd
   restart: always
   volumes:
     # Replace with path to config file of fluentd in CloudOpting machine
