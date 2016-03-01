@@ -1,5 +1,5 @@
 manager_db:
-  image: cloudopting/manager-db
+  image: cloudopting/manager-db:2.0.0
   #build: ./database
   restart: always
   hostname: db
