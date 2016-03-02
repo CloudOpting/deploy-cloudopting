@@ -8,8 +8,8 @@ manager_db:
     - POSTGRES_USER=postgres
     - POSTGRES_PASSWORD=1qaz2wsx
   # Expose ports only for debug
-  #ports:
-  #  - "5432:5432"
+  ports:
+    - "5432:5432"
 
 manager_jcr:
   image: cloudopting/manager-jcr
