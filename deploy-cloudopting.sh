@@ -12,4 +12,6 @@ IP_FLUENTD=$(docker inspect --format '{{ .NetworkSettings.Networks.bridge.IPAddr
 
 sed -i 's/fluentd-address:\s*.*/fluentd-address: \"'$IP_FLUENTD:$PORT_FLUENTD'\"/g' $COMPOSE
 
-docker-compose -f $COMPOSE up
+ECHO "DO NOT FORGET TO SET UP THE PASSWORD FOR THE JASYP ENCRIPTOR ON $COMPOSE
+
+docker-compose -f $COMPOSE up -d

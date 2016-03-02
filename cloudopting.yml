@@ -23,7 +23,7 @@ manager_jcr:
 
 manager:
   image: cloudopting/manager:2.0.0
-  #build: ./manager
+#  build: ./manager
   restart: always
   hostname: manager
   container_name: co_manager
@@ -33,6 +33,7 @@ manager:
     - commander:crane
   environment:
     - JAVA_OPTS=-Dspring.profiles.active=docker
+#    - JASYPT_ENCRYPTOR_PASSWORD=
   ports:
     - "8080:8080"
 
@@ -60,10 +61,10 @@ commander:
 #    - emulatedhost
 # Uncomment this to run manually
 #   command: tail -f /dev/null
-  log_driver: "fluentd"
-  log_opt:
-    fluentd-address: "172.17.0.2:24225"
-    fluentd-tag: "cranecommander.{{.Name}}.{{.ID}}"
+#  log_driver: "fluentd"
+#  log_opt:
+#    fluentd-address: "172.17.0.2:24225"
+#    fluentd-tag: "cranecommander.{{.Name}}.{{.ID}}"
 
 registry:
   image: registry:2
@@ -81,10 +82,10 @@ registry:
 # Disabled registry authentication
 #    REGISTRY_AUTH_HTPASSWD_PATH: /auth/htpasswd
 #    REGISTRY_AUTH_HTPASSWD_REALM: Registry Realm
-  log_driver: "fluentd"
-  log_opt:
-   fluentd-address: "172.17.0.2:24225"
-   fluentd-tag: "craneregistry.{{.Name}}.{{.ID}}"
+#  log_driver: "fluentd"
+#  log_opt:
+#   fluentd-address: "172.17.0.2:24225"
+#   fluentd-tag: "craneregistry.{{.Name}}.{{.ID}}"
 
 engine:
   image: cloudopting/craneengine
@@ -100,10 +101,10 @@ engine:
   container_name: co_engine
   links:
     - registry:coregistry
-  log_driver: "fluentd"
-  log_opt:
-    fluentd-address: "172.17.0.2:24225"
-    fluentd-tag: "craneengine.{{.Name}}.{{.ID}}"
+#  log_driver: "fluentd"
+#  log_opt:
+#    fluentd-address: "172.17.0.2:24225"
+#    fluentd-tag: "craneengine.{{.Name}}.{{.ID}}"
 
 redis:
   image: redis:3
@@ -111,10 +112,10 @@ redis:
   container_name: co_redis
   ports:
     - 6379:6379
-  log_driver: "fluentd"
-  log_opt:
-    fluentd-address: "172.17.0.2:24225"
-    fluentd-tag: "craneredis.{{.Name}}.{{.ID}}"
+#  log_driver: "fluentd"
+#  log_opt:
+#    fluentd-address: "172.17.0.2:24225"
+#    fluentd-tag: "craneredis.{{.Name}}.{{.ID}}"
 
 #emulatedhost:
 #  image: cloudopting/craneemulatedhost
