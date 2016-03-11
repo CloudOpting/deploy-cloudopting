@@ -1,6 +1,12 @@
 # deploy-cloudopting
 Assisted deploy for the entire CloudOpting platform.
 
+Requeriments:
+
+    Linux based environment
+    Docker installed
+    Git installed
+
 Clone:
 
     Clone git repository: git clone https://github.com/CloudOpting/deploy-cloudopting.git
