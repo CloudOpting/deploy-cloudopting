@@ -22,7 +22,7 @@ manager_jcr:
     - "8082:8080"
 
 manager:
-  image: cloudopting/manager:2.0.0
+  image: cloudopting/manager
 #  build: ./manager
   restart: always
   hostname: manager
